@@ -9,13 +9,23 @@ import random
 import torch
 from torch import nn
 
+# libraries for visualizing tensor data
+from matplotlib import pyplot as plt
+from PIL import Image
+import numpy as np
+
 from utils.data import datasets
 from utils.model import models
 from utils.evaluate import Evaluator
 from utils.loss import myloss
 os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
 
-def main(seed=2022, epoches=80): #500
+def worker_init_fn(worker_id):                                                          
+        np.random.seed(np.random.get_state()[1][0] + worker_id)
+
+# here imma have to lower epoch to get my segmented images, it was set to 80 before
+
+def main(seed=2022, epoches=5): #500
     parser = argparse.ArgumentParser(description='ablation')
     # dataset option
     parser.add_argument('--model_name', type=str, default='mosts', choices=['mosts'], help='model name')
@@ -37,9 +47,6 @@ def main(seed=2022, epoches=80): #500
     os.environ['PYTHONHASHSEED'] = str(seed)
     torch.backends.cudnn.deterministic = True
 
-    def worker_init_fn(worker_id):                                                          
-        np.random.seed(np.random.get_state()[1][0] + worker_id)
-
     # Setup data generator
     mydataset_embedding = datasets[args.data_loader]
     data_train = mydataset_embedding(split='train', random_gen = rng_, num_candidates = 5, transform = None, transform_ref = None, valid_group=args.valid_group)
@@ -50,8 +57,12 @@ def main(seed=2022, epoches=80): #500
     evaluator = Evaluator(num_class=data_val.split_point+1) # ignore background class
 
     dir_name = 'log/' + str(args.data_loader) + '_' + str(args.model_name) + '_valid_group_' + str(args.valid_group)
+
     if not os.path.exists(dir_name):
-        os.mkdir(dir_name)
+        #os.mkdir(dir_name)
+        # make directory dir_name, don't overwrite if it exists
+        os.makedirs(dir_name, exist_ok=True)
+    
     now_time = str(time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime()))
     logging.basicConfig(level=logging.INFO,
                         filename=dir_name + '/output_' + now_time + '.log',
@@ -148,7 +159,39 @@ def main(seed=2022, epoches=80): #500
                 seg[seg < 0.5] = 0
  
                 # Add batch sample into evaluator
+
+                # converts predicted segment tensor into numpy array
                 pred = seg.long().data.cpu().numpy()
+
+                # makes directory result, if it already exists then we don't overwrite
+                os.makedirs('results', exist_ok=True)
+
+                # looping through data
+                for idx in range(query.shape[0]): 
+                    # 1. first make directory to store images
+                    # 2. convert the tensor into a numpy array then transpose it into matplot color format (CxHxW to HxWxC)
+                    # 3. save the images in their respectve categories
+
+                    # query image
+                    os.makedirs('results/query', exist_ok=True)
+                    query_img = query[idx].cpu().numpy().transpose(1, 2, 0) 
+                    plt.imsave(f'results/query/query_img_{epoch}_{idx}.png', query_img)
+
+                    # reference image
+                    os.makedirs('results/reference',exist_ok=True)
+                    ref_img = reference[idx].cpu().numpy().transpose(1, 2, 0) 
+                    plt.imsave(f'results/reference/ref_img_{epoch}_{idx}.png', ref_img)
+
+                    # ground truth label
+                    os.makedirs('results/truth_label',exist_ok=True)
+                    label_img = label[idx].cpu().numpy()
+                    plt.imsave(f'results/truth_label/label_img_{epoch}_{idx}.png', label_img, cmap='viridis')
+
+                    # predicted segmentation (already np array)
+                    os.makedirs('results/predicted_segment',exist_ok=True)
+                    pred_img = pred[idx]
+                    plt.imsave(f'results/predicted_segment/pred_img_{epoch}_{idx}.png', pred_img, cmap='inferno')
+                
                 label = label.cpu().numpy()
                 evaluator.add_batch(label, pred, image_class)
 

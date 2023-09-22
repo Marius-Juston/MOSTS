@@ -34,8 +34,12 @@ class ablation_data_loader(torch.utils.data.Dataset):
                       ['dotted','fibrous','flecked','freckled','frilly'],
                       ['gauzy','grid','grooved','honeycombed','interlaced'],
                       ['waffled', 'potholed', 'pleated', 'meshed', 'spiralled']]
+ 
+        #dir = '/dataset/dtd/images' 
 
-        dir = '/dataset/dtd/images' # fill in your data directory here
+        # Windows file directory syntax
+        dir = 'C:\\MOST_training\\MOSTS\\dataset\\dtd\\images' 
+
         idx_to_class, image_path_all = self.load_path(dir)
         total_num_class = len(idx_to_class)
 
