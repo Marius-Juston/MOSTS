@@ -7,10 +7,11 @@ import cv2
 
 from .ablation_generate_collages import generate_collages
 
-def get_key(val,my_dict):
+def get_key(val, my_dict):
     for key, value in my_dict.items():
          if val == value:
              return key
+    print(f"Warning: {val} not found in dictionary")
     return -1
 
 class ablation_data_loader(torch.utils.data.Dataset):
@@ -29,17 +30,28 @@ class ablation_data_loader(torch.utils.data.Dataset):
         else:
             self.random_gen = random_gen
 
-        valid_list = [['banded','blotchy','braided','bubbly','bumpy'],
+        # Original valid list used for the DTD dataset
+        ''' valid_list = [['banded','blotchy','braided','bubbly','bumpy'],
                       ['chequered','cobwebbed','cracked','crosshatched','crystalline'],
                       ['dotted','fibrous','flecked','freckled','frilly'],
                       ['gauzy','grid','grooved','honeycombed','interlaced'],
                       ['waffled', 'potholed', 'pleated', 'meshed', 'spiralled']]
- 
+        '''
+        
+        # Changes made to validation list for: UC Merced dataset
+        valid_list = [['agricultural', 'airplane', 'baseballdiamond', 'beach', 'buildings'],
+                      ['chaparral', 'denseresidential', 'forest', 'freeway', 'golfcourse'],
+                      ['harbor', 'intersection', 'mediumresidential', 'mobilehomepark', 'overpass'],
+                      ['parkinglot', 'river', 'runway', 'sparseresidential', 'storagetanks'],
+                      ['tenniscourt']]
+
         #dir = '/dataset/dtd/images' 
 
-        # Windows file directory syntax
-        dir = 'C:\\MOST_training\\MOSTS\\dataset\\dtd\\images' 
-
+        # Path for DTD dataset images
+        # dir = 'C:\\Users\\AUVSL\\Documents\\Jay\\MOSTS\\dataset\\dtd\\images' 
+        
+        # Path for UC Merced outdoor landuse images:
+        dir = 'C:\\Users\\AUVSL\\Documents\\Jay\\MOSTS\\dataset\\UCMerced_LandUse\\Images'
         idx_to_class, image_path_all = self.load_path(dir)
         total_num_class = len(idx_to_class)
 

@@ -3,3 +3,4 @@ opencv-python
 matplotlib
 torchinfo
 torchsummary
+perlin-noise
