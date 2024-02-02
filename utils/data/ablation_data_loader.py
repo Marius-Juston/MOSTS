@@ -31,27 +31,28 @@ class ablation_data_loader(torch.utils.data.Dataset):
             self.random_gen = random_gen
 
         # Original valid list used for the DTD dataset
-        ''' valid_list = [['banded','blotchy','braided','bubbly','bumpy'],
+        valid_list = [['banded','blotchy','braided','bubbly','bumpy'],
                       ['chequered','cobwebbed','cracked','crosshatched','crystalline'],
                       ['dotted','fibrous','flecked','freckled','frilly'],
                       ['gauzy','grid','grooved','honeycombed','interlaced'],
                       ['waffled', 'potholed', 'pleated', 'meshed', 'spiralled']]
-        '''
+        
         
         # Changes made to validation list for: UC Merced dataset
-        valid_list = [['agricultural', 'airplane', 'baseballdiamond', 'beach', 'buildings'],
+        '''valid_list = [['agricultural', 'airplane', 'baseballdiamond', 'beach', 'buildings'],
                       ['chaparral', 'denseresidential', 'forest', 'freeway', 'golfcourse'],
                       ['harbor', 'intersection', 'mediumresidential', 'mobilehomepark', 'overpass'],
                       ['parkinglot', 'river', 'runway', 'sparseresidential', 'storagetanks'],
                       ['tenniscourt']]
+        '''
 
         #dir = '/dataset/dtd/images' 
 
         # Path for DTD dataset images
-        # dir = 'C:\\Users\\AUVSL\\Documents\\Jay\\MOSTS\\dataset\\dtd\\images' 
+        dir = 'C:\\Users\\AUVSL\\Documents\\Jay\\MOSTS\\dataset\\dtd\\images' 
         
         # Path for UC Merced outdoor landuse images:
-        dir = 'C:\\Users\\AUVSL\\Documents\\Jay\\MOSTS\\dataset\\UCMerced_LandUse\\Images'
+        # dir = 'C:\\Users\\AUVSL\\Documents\\Jay\\MOSTS\\dataset\\UCMerced_LandUse\\Images'
         idx_to_class, image_path_all = self.load_path(dir)
         total_num_class = len(idx_to_class)
 
